@@ -10,6 +10,8 @@ total_time = 0
 start_time = 0
 Timestep = 1 # 1=seconds, 2=minutes, 3=hours
 
+FUN = True
+
 def Input_Splitter(Input):
     Input = [int(s) for s in Input.split() if s.isdigit()] # "S" is the Number being looked for for the grix dimentions (Returns Array of all Numbers found)
     Input = Input[0]
@@ -49,9 +51,13 @@ Mem,Mem2 = 0,0
 MemP = ['You used "Bad grammer"','You used "Mental deficiency"','You used "Confused mumble"']
 MemL = ['*Its not very effective*','"Glancing blow!", data logger takes 5 damage','Data logger is impressed by your skills','It misses','This makes data logger very sad','The only person you hurt is yourself, you take 10 damage']
 Texm = ['-Data Logger-','hp-----------','                 -Sweaty Nerd-','                  hp---       ','------------------------------']
+Php1 = ("\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F")
+Php2 = ("\n"+"\n"+"\n"+"\n"+"\n")
+P2hp1 = ("\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F")
+P2hp2 = ("\n"+"\n"+"\n"+"\n"+"\n"+"\n"+"\n")
 # Just For FUN ^
 
-print('Welcome to the python data logger, enter "help" for a help menue or type "done" to stop')
+print('Welcome to the python data logger, enter "help" for a help menu or type "done" to stop')
 
 Run = True
 while Run == True:
@@ -145,43 +151,73 @@ while Run == True:
     elif Input == 'done':
         Run = False
 
+    elif Input == 'FUN':
+        FUN = not FUN
+
     elif Input == 'delete':
         print('This will destroy all past saved data')
         print('Are you sure you want to do this?  y/n')
         Input = input()
         if Input == 'yes' or Input == 'y':
-            print('Oof')
+            total_time = 0
+            Save()
+            print('Time wiped')
+        else:
+            print('Time not wiped')
 
     else: # All just FUN v
-        rows, columns = os.popen('stty size', 'r').read().split()
-        loop = int(rows[0]+rows[1])
+        if FUN == True:
+            rows, columns = os.popen('stty size', 'r').read().split()
+            loop = int(rows[0]+rows[1])
 
-        for i in range((loop//2-1)):
-            print("\n")
-        for i in range(loop):
-            print("\033[F"+"\033[F")
+            for i in range((loop//2-1)):
+                print("\n")
+            for i in range(loop):
+                print("\033[F"+"\033[F")
 
-        time.sleep(0.5)
+            time.sleep(0.5)
 
-        for i in Texm:
-            print(i)
-        print(MemP[Mem2]+"\n"+"\n")
-        print('------------------------------')
-        time.sleep(3)
-        print("\033[F"+"\033[F"+MemL[Mem]+"\n")
-        time.sleep(4)
-        print("\n"+"\n"+'Welcome to the python data logger, enter "help" for a help menue or type "done" to stop')
+            for i in Texm:
+                print(i)
+            print(MemP[Mem2]+"\n"+"\n")
+            print('------------------------------')
+            time.sleep(3)
+            print("\033[F"+"\033[F"+MemL[Mem]+"\n")
+            if Mem == 0:
+                Texm[1] = 'hp-----------'
+
+            if Mem == 1:
+                Texm[1] = 'hp---------  '
+                for i in range(2,8):
+                    if i%2 == 0:
+                        print(P2hp1+'hp-----------'+P2hp2)
+                    else:
+                        print(P2hp1+'hp---------  '+P2hp2)
+                    time.sleep(0.4)
+
+            if Mem == 5:
+                for i in range(2,8):
+                    if i%2 == 0:
+                        print(Php1+'                  hp---       '+Php2)
+                    else:
+                        print(Php1+'                  hp-        '+Php2)
+                    time.sleep(0.4)
+            time.sleep(2)
+            print('type FUN to disable fun mode ;)')
+            print("\n"+"\n"+'Welcome to the python data logger, enter "help" for a help menu or type "done" to stop')
 
 
-        for i in range((loop//2)-2):
-            print("\n")
-        for i in range(loop-4):
-            print("\033[F"+"\033[F")
-        if start_time != 0:
-            start_time += 2
-        Mem += 1
-        Mem2 += 1
-        if Mem == len(MemL):
-            Mem = 0
-        if Mem2 == len(MemP):
-            Mem2 = 0
+            for i in range((loop//2)-2):
+                print("\n")
+            for i in range(loop-4):
+                print("\033[F"+"\033[F")
+            if start_time != 0:
+                start_time += 2
+            Mem += 1
+            Mem2 += 1
+            if Mem == len(MemL):
+                Mem = 0
+            if Mem2 == len(MemP):
+                Mem2 = 0
+        else:
+            print('Invalid input')
