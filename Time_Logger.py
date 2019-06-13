@@ -5,12 +5,10 @@ import re
 # Jaden M Graner 2019
 # Minimaly commented as it's pretty self explanitory
 
-# v Always in seconds, needs to always be on line 9 so it can be written to properly
+# v Always in seconds, needs to always be on line 9 so it can be written to properly #Previous time 16772.66533255577
 total_time = 0
 start_time = 0
-Timestep = 1 # 1=seconds, 2=minutes, 3=hours
-
-FUN = True
+Timestep = 0 # 0=seconds, 1=minutes, 2=hours
 
 def Input_Splitter(Input):
     Input = [int(s) for s in Input.split() if s.isdigit()] # "S" is the Number being looked for for the grix dimentions (Returns Array of all Numbers found)
@@ -18,11 +16,11 @@ def Input_Splitter(Input):
     return Input
 
 def Get_Units(Timestep):
-    if Timestep == 1:
+    if Timestep == 0:
         T = 'seconds'
-    elif Timestep == 2:
+    elif Timestep == 1:
         T = 'minutes'
-    elif Timestep == 3:
+    elif Timestep == 2:
         T = 'hours'
     return(T)
 
@@ -31,6 +29,7 @@ def Running():
         return(time.time()-start_time)
     else:
         return(0)
+
 def Save():
     Path = os.path.dirname(os.path.realpath(__file__))
     Path = (Path+"/Time_Logger.py")
@@ -41,21 +40,11 @@ def Save():
         with open(Path,'w') as File:
             File.writelines(Data)
         print('Saved Successfully')
-    except:
-        print('Save Failed, Data Remaining Local')
+    except Exception as e:
+        print('Save FAILED, Data remaining local')
         print('Now would be a good time to wrte down your total time:')
         print('Total Time:', total_time, 'Seconds')
-
-# Just For FUN v
-Mem,Mem2 = 0,0
-MemP = ['You used "Bad grammer"','You used "Mental deficiency"','You used "Confused mumble"']
-MemL = ['*Its not very effective*','"Glancing blow!", data logger takes 5 damage','Data logger is impressed by your skills','It misses','This makes data logger very sad','The only person you hurt is yourself, you take 10 damage']
-Texm = ['-Data Logger-','hp-----------','                 -Sweaty Nerd-','                  hp---       ','------------------------------']
-Php1 = ("\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F")
-Php2 = ("\n"+"\n"+"\n"+"\n"+"\n")
-P2hp1 = ("\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F"+"\033[F")
-P2hp2 = ("\n"+"\n"+"\n"+"\n"+"\n"+"\n"+"\n")
-# Just For FUN ^
+        print('Error:',e)
 
 print('Welcome to the python data logger, enter "help" for a help menu or type "done" to stop')
 
@@ -63,22 +52,29 @@ Run = True
 while Run == True:
     Input = input()
     if Input == 'help':
-        print('Total time:',total_time,'seconds')
+        print('')
+        print('Saved time:',total_time,'seconds')
         print('Running time:',Running(),'seconds')
-        print('Time is currently in:',Get_Units(Timestep))
-        print('Start logging time: start')
-        print('Stop logging time: stop')
-        print('Manually add time: add')
-        print('Show current time: show')
-        print('Change time units: units')
-        print('Wipe stored data: delete')
+        print('Time is currently displayed in:',Get_Units(Timestep))
+        print('')
+        print('start  <-Start logging time')
+        print('Stop   <-stop logging time')
+        print('')
+        print('add    <-Manually add time')
+        print('sub    <-Manually subtract time')
+        print('')
+        print('show   <-Show current time')
+        print('units  <-Change time units')
+        print('wipe   <-Wipe stored data')
 
 
     elif Input == 'start':
+        print('Now logging time')
         start_time = time.time()
 
     elif Input == 'stop':
         if start_time != 0:
+            print('Stopping time logging')
             end_time = time.time()
             run_time = end_time - start_time
             total_time += run_time
@@ -89,72 +85,66 @@ while Run == True:
             print('~No time logged')
 
     elif Input == 'add':
-        if Timestep == 3:
-            print('Enter Time in hours:')
-            Input = input()
-            try:
-                total_time += (Input_Splitter(Input)*3600)
-            except:
-                print('Invalid input')
-        elif Timestep == 2:
-            print('Enter Time in minutes:')
-            Input = input()
-            try:
-                total_time += (Input_Splitter(Input)*60)
-            except:
-                print('Invalid input')
-        elif Timestep == 1:
-            print('Enter Time in seconds:')
-            Input = input()
-            try:
-                total_time += Input_Splitter(Input)
-            except:
-                print('Invalid input')
+        print('Enter Time to add in:',Get_Units(Timestep))
+        Input = input()
+        try:
+            total_time += (Input_Splitter(Input)*(60**Timestep))
+            print('Added:',(Input_Splitter(Input)*(60**Timestep)),'Seconds')
+        except Exception as e:
+            print('Invalid input')
+            print('Error:',e)
+        Save()
+
+    elif Input == 'sub':
+        print('Enter time to subtract in:',Get_Units(Timestep))
+        Input = input()
+        try:
+            total_time -= (Input_Splitter(Input)*(60**Timestep))
+            print('Removed:',(Input_Splitter(Input)*(60**Timestep)),'seconds')
+        except Exception as e:
+            print('Invalid input')
+            print('Error:',e)
         Save()
 
     elif Input == 'show':
-        if Timestep == 1:
-            print('Logged time:',total_time)
-            print('Runnning time:',Running())
-        if Timestep == 2:
-            print('Logged time:',total_time//60)
-            print('Runnning time:',Running()//60)
-        if Timestep == 3:
-            print('Logged time:',total_time//3600)
-            print('Runnning time:',Running()//3600)
+        print('Logged time:',total_time//(60**Timestep),Get_Units(Timestep))
+        print('Runnning time:',Running()//(60**Timestep),Get_Units(Timestep))
 
     elif Input == 'units':
-        T = Get_Units(Timestep)
-        print('Current unit is: ',T)
+        print('Current unit is: ',Get_Units(Timestep))
         Picking = True
         while Picking == True:
-            print('To chang enter 1,2,or 3 for seconds, minutes, and hours; or press c to cancel:')
+            print('To chang enter 0,1,or 2 for seconds, minutes, and hours; or press c to cancel:')
             Input = input()
             if Input == 'C':
                 Picking = False
             else:
                 try:
                     New_Timestep = Input_Splitter(Input)
-                    if (New_Timestep < 1) or (New_Timestep > 3):
+                    if (New_Timestep > 2):
                         print('Invalid input')
                         print('Current unit is still: ',T)
                     else:
                         Timestep = New_Timestep
-                        T = Get_Units(Timestep)
                         print('Valid input')
-                        print('Current unit is now: ',T)
+                        print('Current unit is now: ',Get_Units(Timestep))
                         Picking = False
-                except:
+                except Exception as e:
                     print('Invalid input')
                     print('Current unit is still: ',T)
+                    print('Error:',e)
 
     elif Input == 'done':
         Run = False
+        if start_time != 0:
+            end_time = time.time()
+            run_time = end_time - start_time
+            total_time += run_time
+            print('Saved time:',run_time//(60**Timestep),Get_Units(Timestep))
+            start_time = 0
+        Save()
 
-    elif Input == 'FUN':
-        FUN = not FUN
-
-    elif Input == 'delete':
+    elif Input == 'wipe':
         print('This will destroy all past saved data')
         print('Are you sure you want to do this?  y/n')
         Input = input()
@@ -165,59 +155,5 @@ while Run == True:
         else:
             print('Time not wiped')
 
-    else: # All just FUN v
-        if FUN == True:
-            rows, columns = os.popen('stty size', 'r').read().split()
-            loop = int(rows[0]+rows[1])
-
-            for i in range((loop//2-1)):
-                print("\n")
-            for i in range(loop):
-                print("\033[F"+"\033[F")
-
-            time.sleep(0.5)
-
-            for i in Texm:
-                print(i)
-            print(MemP[Mem2]+"\n"+"\n")
-            print('------------------------------')
-            time.sleep(3)
-            print("\033[F"+"\033[F"+MemL[Mem]+"\n")
-            if Mem == 0:
-                Texm[1] = 'hp-----------'
-
-            if Mem == 1:
-                Texm[1] = 'hp---------  '
-                for i in range(2,8):
-                    if i%2 == 0:
-                        print(P2hp1+'hp-----------'+P2hp2)
-                    else:
-                        print(P2hp1+'hp---------  '+P2hp2)
-                    time.sleep(0.4)
-
-            if Mem == 5:
-                for i in range(2,8):
-                    if i%2 == 0:
-                        print(Php1+'                  hp---       '+Php2)
-                    else:
-                        print(Php1+'                  hp-        '+Php2)
-                    time.sleep(0.4)
-            time.sleep(2)
-            print('type FUN to disable fun mode ;)')
-            print("\n"+"\n"+'Welcome to the python data logger, enter "help" for a help menu or type "done" to stop')
-
-
-            for i in range((loop//2)-2):
-                print("\n")
-            for i in range(loop-4):
-                print("\033[F"+"\033[F")
-            if start_time != 0:
-                start_time += 2
-            Mem += 1
-            Mem2 += 1
-            if Mem == len(MemL):
-                Mem = 0
-            if Mem2 == len(MemP):
-                Mem2 = 0
-        else:
-            print('Invalid input')
+    else:
+        print('Invalid input')
